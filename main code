@@ -479,7 +479,7 @@ def plot_uncovered_points(no_block_points, block_polygons, output_file):
     if no_block_points:
         uncovered_lons = [p[0] for p in no_block_points]
         uncovered_lats = [p[1] for p in no_block_points]
-        plt.scatter(uncovered_lons, uncovered_lats, c='red', s=20, marker='x', label='未被覆盖的点')
+        plt.scatter(uncovered_lons, uncovered_lats, c='red', s=20, marker='x', label='no point')
 
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
@@ -514,7 +514,7 @@ if __name__ == "__main__":
     ws_list = [3]
     data_file = "ordos.txt"
     measured_file = "heatflow_0.1.txt"  
-    block_dir = "C:/Users/61661/PycharmProjects/pythonProject/地磁地热研究/地球物理学报/块体"
+    block_dir = "block"
 
     measured_lons, measured_lats, measured_heat_flows = load_measured_heat_flow(measured_file)
     block_polygons = load_block_polygons(block_dir)
