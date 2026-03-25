@@ -1,0 +1,162 @@
+import os
+import matplotlib.pyplot as plt
+from matplotlib.widgets import LassoSelector
+import geopandas as gpd
+from shapely.geometry import LineString, Polygon, Point
+from shapely.ops import unary_union, nearest_points
+
+# ========= 1. 读 txt：多条断裂线 =========
+
+def read_multiline_txt(path):
+    lines = []
+    coords = []
+    with open(path, 'r', encoding='utf-8') as f:
+        for raw in f:
+            s = raw.strip()
+            if not s:
+                continue
+            if s.startswith('>'):
+                if coords:
+                    lines.append(LineString(coords))
+                    coords = []
+                continue
+            parts = [p for p in s.replace(',', ' ').split() if p]
+            if len(parts) < 2:
+                continue
+            lon, lat = map(float, parts[:2])
+            coords.append((lon, lat))
+    if coords:
+        lines.append(LineString(coords))
+    return gpd.GeoDataFrame(geometry=lines, crs="EPSG:4326")
+
+
+# ========= 2. 读入断裂 + 外框 =========
+
+txt_file = "duance修改.txt"   # 换成你的断裂 txt 文件名
+fault_lines = read_multiline_txt(txt_file)
+
+# 研究区外框（按你的范围改）
+lon_min, lon_max = 100.0, 118.0
+lat_min, lat_max = 31.0, 43.0
+outer_poly = Polygon([
+    (lon_min, lat_min),
+    (lon_max, lat_min),
+    (lon_max, lat_max),
+    (lon_min, lat_max),
+    (lon_min, lat_min),
+])
+outer_boundary = outer_poly.boundary
+
+# 断裂 + 外框 做一个 union，用来“吸附”
+all_lines = list(fault_lines.geometry) + [outer_boundary]
+union_lines = unary_union(all_lines)
+
+# ========= 3. 画底图 =========
+
+fig, ax = plt.subplots(figsize=(8, 8))
+fault_lines.plot(ax=ax, color="red", linewidth=0.8, label="Faults")
+gpd.GeoSeries([outer_boundary], crs="EPSG:4326").plot(
+    ax=ax, linestyle="--", color="black", linewidth=1.0, label="Boundary"
+)
+
+ax.set_xlim(lon_min, lon_max)
+ax.set_ylim(lat_min, lat_max)
+ax.set_xlabel("Longitude (°E)")
+ax.set_ylabel("Latitude (°N)")
+ax.set_title("按住左键画一圈块体；松开生成\n按 u 撤销上一个块体，按 q 退出")
+ax.set_aspect("equal", adjustable="box")
+
+block_id = 1  # 下一个要写入的块体编号
+
+# 用来保存已经画出的块体信息：[(line_artist, text_artist, filename), ...]
+drawn_blocks = []
+
+
+# ========= 4. Lasso 选择回调：一笔画出一个块体 =========
+
+def onselect(verts):
+    """
+    verts: [(x1,y1), (x2,y2), ...] 为你一笔画出来的路径顶点
+    """
+    global block_id, drawn_blocks
+
+    # （1）把路径顶点吸附到最近的断裂/边界上
+    snapped = []
+    for x, y in verts:
+        p = Point(x, y)
+        _, p_on_line = nearest_points(p, union_lines)
+        snapped.append((p_on_line.x, p_on_line.y))
+
+    # 如果点太多，可以简单抽稀一下（可选）
+    # snapped = snapped[::2]
+
+    if len(snapped) < 3:
+        print("点太少，无法形成多边形，忽略这次绘制。")
+        return
+
+    # （2）构造多边形（自动闭合）
+    poly = Polygon(snapped)
+
+    # （3）画出来
+    xs, ys = poly.exterior.xy
+    line_artist, = ax.plot(xs, ys, color="orange", linewidth=1.5)
+    cx, cy = poly.representative_point().x, poly.representative_point().y
+    text_artist = ax.text(cx, cy, str(block_id), color="purple",
+                          ha="center", va="center", fontsize=12)
+    fig.canvas.draw_idle()
+
+    # （4）导出为 txt
+    out_name = f"block_{block_id}.txt"
+    with open(out_name, "w", encoding="utf-8") as f:
+        for x, y in poly.exterior.coords:
+            f.write(f"{x:.6f} {y:.6f}\n")
+    print(f"已保存块体 {block_id} 为 {out_name}")
+
+    # 保存这个块体的图像对象和文件名，方便撤销
+    drawn_blocks.append((line_artist, text_artist, out_name))
+
+    block_id += 1
+
+
+# 创建 LassoSelector（按住左键拖动即可画线）
+lasso = LassoSelector(ax, onselect=onselect)
+
+
+# ========= 5. 键盘事件：u 撤销上一块，q 退出 =========
+
+def on_key(event):
+    global block_id, drawn_blocks
+
+    # 撤销上一次画的块体
+    if event.key == "u":
+        if not drawn_blocks:
+            print("当前没有可以撤销的块体。")
+            return
+
+        line_artist, text_artist, filename = drawn_blocks.pop()
+
+        # 从图上删除线和文字
+        line_artist.remove()
+        text_artist.remove()
+
+        # 删除对应的 txt 文件（如果存在）
+        if os.path.exists(filename):
+            os.remove(filename)
+            print(f"已撤销并删除 {filename}")
+        else:
+            print(f"已撤销块体，但未找到文件 {filename}")
+
+        # 编号回退一个
+        block_id -= 1
+
+        fig.canvas.draw_idle()
+
+    # 退出程序
+    elif event.key == "q":
+        print("退出。")
+        plt.close(fig)
+
+fig.canvas.mpl_connect("key_press_event", on_key)
+
+plt.legend(loc="lower left")
+plt.show()
