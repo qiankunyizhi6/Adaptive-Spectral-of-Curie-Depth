@@ -21,7 +21,6 @@ The spatial resolution of the magnetic anomaly data used in this project is 0.05
 
 The window ranges are controlled by the following parameters:
 
-```python
 myrange1_start = trial.suggest_int("myrange1_start", 0, 20)
 myrange1_end = trial.suggest_int("myrange1_end", myrange1_start + 1, 25)
 myrange2_start = trial.suggest_int("myrange2_start", 0, 20)
