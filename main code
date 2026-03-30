@@ -252,7 +252,7 @@ def objective(trial, b2, window_size, data_file, measured_lons, measured_lats, m
 def optimize_for_b2_ws(b2, window_size, data_file, measured_lons, measured_lats, measured_heat_flows, n_trials):
 
     if len(measured_lons) == 0:
-        print("    ⚠️ 没有实测点，跳过优化")
+        print("⚠️ No actual measurement points found. Skipping optimization.")
         return None, 1000.0
     successful_trials = 0
     failed_trials = 0
@@ -285,7 +285,6 @@ def optimize_for_b2_ws(b2, window_size, data_file, measured_lons, measured_lats,
         print(f"   An abnormality occurred during the optimization process.: {e}")
         return None, 1000.0
 
-    # 检查是否有成功的试验
     if len(study.trials) == 0:
         print(f"    ⚠️ All the experiments failed and no effective parameters could be found.")
         return None, 1000.0
