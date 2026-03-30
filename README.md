@@ -38,8 +38,13 @@ The program finally generates a series of output files, including the optimized 
 2.<img width="2841" height="2096" alt="image" src="https://github.com/user-attachments/assets/39127a28-06be-4c7e-a611-608d11a14f4c" />
 
 3.example：101.000 32.000 25.143
+
           101.500 32.000 26.877
+          
           102.000 32.000 23.311
+          
           102.500 32.000 25.359
+          
           103.000 32.000 23.688
+          
           103.500 32.000 25.422
