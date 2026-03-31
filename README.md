@@ -146,13 +146,13 @@ Example:
 103.000 32.000 23.688
 103.500 32.000 25.422
 
-2. Fault-Zone Mapping Program: Mapping of fault zones
+# 2. Fault-Zone Mapping Program: Mapping of fault zones
 
 Mapping of fault zones is an auxiliary interactive preprocessing script used to generate the initial tectonic block boundary files for the study area. The program reads fault-line data from a text file, displays the fault traces together with the outer boundary of the study area, and allows users to manually delineate blocks in an interactive plotting window.
 
 During drawing, the selected vertices are automatically snapped to the nearest structural line or boundary line, so that the resulting block boundaries remain consistent with the tectonic framework.
 
-Main functions
+# Main functions
 
 This script provides the following functions:
 
@@ -163,7 +163,7 @@ allows the user to draw polygons interactively using the mouse;
 automatically snaps drawn vertices to the nearest line;
 saves each block polygon as a separate block_*.txt file;
 supports undoing the last block and exiting the session.
-Input
+# Input
 duance.txt
 Fault-line dataset in text format.
 
@@ -207,7 +207,7 @@ merges each blank area into the nearest block;
 forces the final results to valid polygon geometries;
 visualizes the corrected block framework;
 exports the corrected block files.
-Input
+# Input
 
 The script expects initial block files such as:
 
@@ -239,7 +239,7 @@ Magnetic anomaly data
 The magnetic anomaly file should contain three columns:
 
 longitude latitude magnetic_anomaly
-Heat flow data
+# Heat flow data
 
 The heat flow file should contain three columns:
 
@@ -251,7 +251,7 @@ Each block boundary file should contain the polygon coordinates of one tectonic 
 longitude latitude
 longitude latitude
 ...
-How to Run
+# How to Run
 
 A recommended workflow is:
 
