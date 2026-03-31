@@ -28,7 +28,7 @@ A typical repository structure is as follows:
 
 "Adaptive-Spectral-of-Curie-Depth/
 │
-├── main code/n
+├── main code\n
 ├── Mapping of fault zones
 ├── Block division into smaller pieces
 ├── ordos.txt
