@@ -151,6 +151,8 @@ Example:
 
 103.500 32.000 25.422
 
+<img width="2801" height="2096" alt="image" src="https://github.com/user-attachments/assets/2da7ff34-0d1a-40d4-b4f9-f40d728fbbb4" />
+
 # 2. Fault-Zone Mapping Program: Mapping of fault zones
 
 Mapping of fault zones is an auxiliary interactive preprocessing script used to generate the initial tectonic block boundary files for the study area. The program reads fault-line data from a text file, displays the fault traces together with the outer boundary of the study area, and allows users to manually delineate blocks in an interactive plotting window.
@@ -196,6 +198,8 @@ Press q to quit the program.
 Purpose
 
 This script is used to provide a geologically guided initial block division. The quality of the initial block delineation directly affects the subsequent block correction and inversion results.
+
+<img width="2400" height="2400" alt="image" src="https://github.com/user-attachments/assets/3af8624c-cccf-455f-9d4b-49148bfc53ef" />
 
 # 3. Block Correction Program: Block division into smaller pieces
 
